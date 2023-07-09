@@ -2,12 +2,12 @@
 
 declare module '@luma.gl/core' {
     export declare class Model {
-        constructor(WebGLRenderingContext, any)
+        constructor(_1: WebGLRenderingContext, _2: any)
         delete()
-        setUniforms(any)
+        setUniforms(_1: any)
     }
     export declare class Geometry {
-        constructor(any)
+        constructor(_1: any)
     }
 }
 

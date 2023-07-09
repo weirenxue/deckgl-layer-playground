@@ -5,7 +5,7 @@ import DeckGL from '@deck.gl/react/typed';
 import {GeoJsonLayer} from '@deck.gl/layers/typed';
 import {scaleQuantile} from 'd3-scale';
 import './App.css';
-import MyArcLayer from './Layer'
+import MyLineLayer from './Layer'
 
 
 export const inFlowColors = [
@@ -77,6 +77,7 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
   const [selectedCounty, selectCounty] = useState(null);
 
   const arcs = useMemo(() => calculateArcs(data, selectedCounty), [data, selectedCounty]);
+  console.log(arcs)
 
   const layers = [
     new GeoJsonLayer({
@@ -88,14 +89,14 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
       onClick: ({object}: any) => selectCounty(object),
       pickable: true
     }),
-    new MyArcLayer({
+    new MyLineLayer({
       id: 'arc',
       data: arcs as any,
       getSourcePosition: d => d.source,
       getTargetPosition: d => d.target,
-      getSourceColor: d => (d.gain > 0 ? inFlowColors : outFlowColors)[d.quantile] as any,
-      getTargetColor: d => (d.gain > 0 ? outFlowColors : inFlowColors)[d.quantile] as any,
-      getWidth: strokeWidth
+      getSourceColor: (d: any) => (d.gain > 0 ? inFlowColors : outFlowColors)[d.quantile] as any,
+      getTargetColor: (d: any) => (d.gain > 0 ? outFlowColors : inFlowColors)[d.quantile] as any,
+      getWidth: strokeWidth,
     })
   ];
 

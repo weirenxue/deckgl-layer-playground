@@ -23,35 +23,28 @@ import {
   project32,
   picking,
   UNIT,
-  UpdateParameters,
   LayerProps,
   LayerDataSource,
   Unit,
-  AccessorFunction,
   Position,
   Accessor,
   Color,
+  UpdateParameters,
   DefaultProps
 } from '@deck.gl/core/typed';
-
 import GL from '@luma.gl/constants';
 import {Model, Geometry} from '@luma.gl/core';
 
-import vs from './arc-layer-vertex.glsl';
-import fs from './arc-layer-fragment.glsl';
+import vs from './line-layer-vertex.glsl';
+import fs from './line-layer-fragment.glsl';
 
 const DEFAULT_COLOR: [number, number, number, number] = [0, 0, 0, 255];
 
-const defaultProps: DefaultProps<ArcLayerProps> = {
+const defaultProps: DefaultProps<LineLayerProps> = {
   getSourcePosition: {type: 'accessor', value: x => x.sourcePosition},
   getTargetPosition: {type: 'accessor', value: x => x.targetPosition},
-  getSourceColor: {type: 'accessor', value: DEFAULT_COLOR},
-  getTargetColor: {type: 'accessor', value: DEFAULT_COLOR},
+  getColor: {type: 'accessor', value: DEFAULT_COLOR},
   getWidth: {type: 'accessor', value: 1},
-  getHeight: {type: 'accessor', value: 1},
-  getTilt: {type: 'accessor', value: 0},
-
-  greatCircle: false,
 
   widthUnits: 'pixels',
   widthScale: {type: 'number', value: 1, min: 0},
@@ -59,20 +52,14 @@ const defaultProps: DefaultProps<ArcLayerProps> = {
   widthMaxPixels: {type: 'number', value: Number.MAX_SAFE_INTEGER, min: 0}
 };
 
-/** All properties supported by ArcLayer. */
-export type ArcLayerProps<DataT = any> = _ArcLayerProps<DataT> & LayerProps;
+/** All properties supported by LineLayer. */
+export type LineLayerProps<DataT = any> = _LineLayerProps<DataT> & LayerProps;
 
-/** Properties added by ArcLayer. */
-type _ArcLayerProps<DataT> = {
+/** Properties added by LineLayer. */
+type _LineLayerProps<DataT> = {
   data: LayerDataSource<DataT>;
   /**
-   * If `true`, create the arc along the shortest path on the earth surface.
-   * @default false
-   */
-  greatCircle?: boolean;
-
-  /**
-   * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`
+   * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`.
    * @default 'pixels'
    */
   widthUnits?: Unit;
@@ -96,58 +83,38 @@ type _ArcLayerProps<DataT> = {
   widthMaxPixels?: number;
 
   /**
-   * Method called to retrieve the source position of each object.
+   * Source position of each object.
    * @default object => object.sourcePosition
    */
-  getSourcePosition?: AccessorFunction<DataT, Position>;
+  getSourcePosition?: Accessor<DataT, Position>;
 
   /**
-   * Method called to retrieve the target position of each object.
+   * Target position of each object.
    * @default object => object.targetPosition
    */
-  getTargetPosition?: AccessorFunction<DataT, Position>;
+  getTargetPosition?: Accessor<DataT, Position>;
 
   /**
    * The rgba color is in the format of `[r, g, b, [a]]`.
    * @default [0, 0, 0, 255]
    */
-  getSourceColor?: Accessor<DataT, Color>;
+  getColor?: Accessor<DataT, Color>;
 
   /**
-   * The rgba color is in the format of `[r, g, b, [a]]`.
-   * @default [0, 0, 0, 255]
-   */
-  getTargetColor?: Accessor<DataT, Color>;
-
-  /**
-   * The line width of each object, in units specified by `widthUnits`.
+   * Width of each object
    * @default 1
    */
   getWidth?: Accessor<DataT, number>;
-
-  /**
-   * Multiplier of layer height. `0` will make the layer flat.
-   * @default 1
-   */
-  getHeight?: Accessor<DataT, number>;
-
-  /**
-   * Use to tilt the arc to the side if you have multiple arcs with the same source and target positions.
-   * @default 0
-   */
-  getTilt?: Accessor<DataT, number>;
 };
 
-/** Render raised arcs joining pairs of source and target coordinates. */
-export default class ArcLayer<DataT = any, ExtraPropsT extends {} = {}> extends Layer<
-  ExtraPropsT & Required<_ArcLayerProps<DataT>>
+/**
+ * A layer that renders straight lines joining pairs of source and target coordinates.
+ */
+export default class LineLayer<DataT = any, ExtraProps extends {} = {}> extends Layer<
+  ExtraProps & Required<_LineLayerProps<DataT>>
 > {
-  static layerName = 'ArcLayer';
+  static layerName = 'LineLayer';
   static defaultProps = defaultProps;
-
-  state!: Layer['state'] & {
-    model?: Model;
-  };
 
   getBounds(): [number[], number[]] | null {
     return this.getAttributeManager()?.getBounds([
@@ -157,11 +124,11 @@ export default class ArcLayer<DataT = any, ExtraPropsT extends {} = {}> extends 
   }
 
   getShaders() {
-    return super.getShaders({vs, fs, modules: [project32, picking]}); // 'project' module added by default.
+    return super.getShaders({vs, fs, modules: [project32, picking]});
   }
 
   // This layer has its own wrapLongitude logic
-  get wrapLongitude() {
+  get wrapLongitude(): boolean {
     return false;
   }
 
@@ -184,48 +151,28 @@ export default class ArcLayer<DataT = any, ExtraPropsT extends {} = {}> extends 
         transition: true,
         accessor: 'getTargetPosition'
       },
-      instanceSourceColors: {
+      instanceColors: {
         size: this.props.colorFormat.length,
         type: GL.UNSIGNED_BYTE,
         normalized: true,
         transition: true,
-        accessor: 'getSourceColor',
-        defaultValue: DEFAULT_COLOR
-      },
-      instanceTargetColors: {
-        size: this.props.colorFormat.length,
-        type: GL.UNSIGNED_BYTE,
-        normalized: true,
-        transition: true,
-        accessor: 'getTargetColor',
-        defaultValue: DEFAULT_COLOR
+        accessor: 'getColor',
+        defaultValue: [0, 0, 0, 255]
       },
       instanceWidths: {
         size: 1,
         transition: true,
         accessor: 'getWidth',
         defaultValue: 1
-      },
-      instanceHeights: {
-        size: 1,
-        transition: true,
-        accessor: 'getHeight',
-        defaultValue: 1
-      },
-      instanceTilts: {
-        size: 1,
-        transition: true,
-        accessor: 'getTilt',
-        defaultValue: 0
       }
     });
     /* eslint-enable max-len */
   }
 
-  updateState(opts: UpdateParameters<this>): void {
-    super.updateState(opts);
-    // Re-generate model if geometry changed
-    if (opts.changeFlags.extensionsChanged) {
+  updateState(params: UpdateParameters<this>): void {
+    super.updateState(params);
+
+    if (params.changeFlags.extensionsChanged) {
       const {gl} = this.context;
       this.state.model?.delete();
       this.state.model = this._getModel(gl);
@@ -233,26 +180,31 @@ export default class ArcLayer<DataT = any, ExtraPropsT extends {} = {}> extends 
     }
   }
 
-  draw({uniforms}: any) {
-    const {widthUnits, widthScale, widthMinPixels, widthMaxPixels, greatCircle, wrapLongitude} =
-      this.props;
+  draw({uniforms}: any): void {
+    const {widthUnits, widthScale, widthMinPixels, widthMaxPixels, wrapLongitude} = this.props;
 
     this.state.model
-      ?.setUniforms(uniforms)
+      .setUniforms(uniforms)
       .setUniforms({
-        greatCircle,
         widthUnits: UNIT[widthUnits],
         widthScale,
         widthMinPixels,
         widthMaxPixels,
-        useShortestPath: wrapLongitude
+        useShortestPath: wrapLongitude ? 1 : 0
       })
       .draw();
+
+    if (wrapLongitude) {
+      // Render a second copy for the clipped lines at the 180th meridian
+      this.state.model
+        .setUniforms({
+          useShortestPath: -1
+        })
+        .draw();
+    }
   }
 
   protected _getModel(gl: WebGLRenderingContext): Model {
-    let positions: number[] = [];
-    const NUM_SEGMENTS = 50;
     /*
      *  (0, -1)-------------_(1, -1)
      *       |          _,-"  |
@@ -260,11 +212,9 @@ export default class ArcLayer<DataT = any, ExtraPropsT extends {} = {}> extends 
      *       |  _,-"          |
      *   (0, 1)"-------------(1, 1)
      */
-    for (let i = 0; i < NUM_SEGMENTS; i++) {
-      positions = positions.concat([i, 1, 0, i, -1, 0]);
-    }
+    const positions = [0, -1, 0, 0, 1, 0, 1, -1, 0, 1, 1, 0];
 
-    const model = new Model(gl, {
+    return new Model(gl, {
       ...this.getShaders(),
       id: this.props.id,
       geometry: new Geometry({
@@ -275,9 +225,5 @@ export default class ArcLayer<DataT = any, ExtraPropsT extends {} = {}> extends 
       }),
       isInstanced: true
     });
-
-    model.setUniforms({numSegments: NUM_SEGMENTS});
-
-    return model;
   }
 }
