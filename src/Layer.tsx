@@ -212,7 +212,8 @@ export default class LineLayer<DataT = any, ExtraProps extends {} = {}> extends 
      *       |  _,-"          |
      *   (0, 1)"-------------(1, 1)
      */
-    const positions = [0, -1, 0, 0, 1, 0, 1, -1, 0, 1, 1, 0];
+    const positions = [0, 0, -1, 0, 0, 1, 1, 0, -1, 1, 0, 1];
+    // const positions = [0, -1, 0, 0, 1, 0, 1, -1, 0, 1, 1, 0];
 
     return new Model(gl, {
       ...this.getShaders(),

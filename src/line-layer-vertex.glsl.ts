@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 // Copyright (c) 2015 - 2017 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -107,11 +108,12 @@ void main(void) {
 
   // extrude
   vec3 offset = vec3(
-    getExtrusionOffset(target.xy - source.xy, positions.y, widthPixels),
+    getExtrusionOffset(target.xz - source.xz, positions.z, widthPixels),
     0.0);
   DECKGL_FILTER_SIZE(offset, geometry);
   DECKGL_FILTER_GL_POSITION(p, geometry);
-  gl_Position = p + vec4(project_pixel_size_to_clipspace(offset.xy), 0.0, 0.0);
+  vec2 proj = project_pixel_size_to_clipspace(offset.xy);
+  gl_Position = p + vec4(proj.x, 0.0, proj.y, 0.0);
 
   // Color
   vColor = vec4(instanceColors.rgb, instanceColors.a * opacity);

@@ -77,7 +77,14 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
   const [selectedCounty, selectCounty] = useState(null);
 
   const arcs = useMemo(() => calculateArcs(data, selectedCounty), [data, selectedCounty]);
-  console.log(arcs)
+  
+  let arc0 = {...arcs![0]}
+  arc0.source[2] = 100
+  arc0.target[0] = arc0.source[0] - 0.001
+  arc0.target[1] = arc0.source[1]
+  arc0.target[2] = 1000
+
+  console.log(arc0)
 
   const layers = [
     new GeoJsonLayer({
@@ -91,12 +98,13 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
     }),
     new MyLineLayer({
       id: 'arc',
-      data: arcs as any,
+      // data: arcs as any,
+      data: [arc0] as any,
       getSourcePosition: d => d.source,
       getTargetPosition: d => d.target,
       getSourceColor: (d: any) => (d.gain > 0 ? inFlowColors : outFlowColors)[d.quantile] as any,
       getTargetColor: (d: any) => (d.gain > 0 ? outFlowColors : inFlowColors)[d.quantile] as any,
-      getWidth: strokeWidth,
+      getWidth: 10,
     })
   ];
 
