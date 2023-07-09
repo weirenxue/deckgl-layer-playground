@@ -29,12 +29,12 @@ export const outFlowColors = [
 ];
 
 const INITIAL_VIEW_STATE = {
-  longitude: -100,
-  latitude: 40.7,
-  zoom: 3,
+  longitude: -118.34921704225347,
+  latitude: 33.83014929577467,
+  zoom: 12,
   maxZoom: 15,
-  pitch: 30,
-  bearing: 30
+  pitch: 60,
+  bearing: 0
 };
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
@@ -77,21 +77,28 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
   const [selectedCounty, selectCounty] = useState(null);
 
   const arcs = useMemo(() => calculateArcs(data, selectedCounty), [data, selectedCounty]);
-  console.log(arcs)
+
+  let arc0 = {...arcs![0]}
+  arc0.source[2] = 100
+  arc0.target[0] = arc0.source[0] - 0.01
+  arc0.target[1] = arc0.source[1] - 0.01
+  arc0.target[2] = 200
+
+  console.log(arc0)
 
   const layers = [
-    new GeoJsonLayer({
-      id: 'geojson',
-      data,
-      stroked: false,
-      filled: true,
-      getFillColor: [0, 0, 0, 0],
-      onClick: ({object}: any) => selectCounty(object),
-      pickable: true
-    }),
+    // new GeoJsonLayer({
+    //   id: 'geojson',
+    //   data,
+    //   stroked: false,
+    //   filled: true,
+    //   getFillColor: [0, 0, 0, 0],
+    //   onClick: ({object}: any) => selectCounty(object),
+    //   pickable: true
+    // }),
     new MyLineLayer({
       id: 'arc',
-      data: arcs as any,
+      data: [arc0] as any,
       getSourcePosition: d => d.source,
       getTargetPosition: d => d.target,
       getSourceColor: (d: any) => (d.gain > 0 ? inFlowColors : outFlowColors)[d.quantile] as any,
