@@ -134,3 +134,29 @@ export default class WallLayer<DataT = any, ExtraProps extends {} = {}> extends 
     });
   }
 }
+
+
+
+export function NewWallLayer(id: string, data: Position[], color: Color): WallLayer {
+  let dataWrapper: {
+    source: Position
+    target: Position
+    color: Color
+  }[] = []
+
+  for (let i = 0; i < data.length - 1; i++) {
+    dataWrapper.push({
+      source: data[i],
+      target: data[i + 1],
+      color: color
+    })
+  }
+  
+  return new WallLayer({
+    id: id,
+    data: dataWrapper,
+    getSourcePosition: (d) => d.source,
+    getTargetPosition: (d) => d.target,
+    getColor: (d) => d.color
+  })
+}

@@ -5,7 +5,7 @@ import DeckGL from '@deck.gl/react/typed';
 import {GeoJsonLayer} from '@deck.gl/layers/typed';
 import {scaleQuantile} from 'd3-scale';
 import './App.css';
-import WallLayer from './wall-layer'
+import WallLayer, {NewWallLayer} from './wall-layer'
 
 
 export const inFlowColors = [
@@ -101,13 +101,14 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
     //   onClick: ({object}: any) => selectCounty(object),
     //   pickable: true
     // }),
-    new WallLayer({
-      id: 'arc',
-      data: [arc0, arc1] as any,
-      getSourcePosition: d => d.source,
-      getTargetPosition: d => d.target,
-      getColor: [255, 0, 0, 80],
-    })
+    // new WallLayer({
+    //   id: 'arc',
+    //   data: [arc0, arc1] as any,
+    //   getSourcePosition: d => d.source,
+    //   getTargetPosition: d => d.target,
+    //   getColor: [255, 0, 0, 80],
+    // })
+    NewWallLayer('arc', [arc0.source, arc0.target, arc1.target], [255, 0, 0, 80])
   ];
 
   return (
