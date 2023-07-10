@@ -1,7 +1,6 @@
 import {
   Layer,
   project32,
-  picking,
   LayerProps,
   LayerDataSource,
   Position,
@@ -59,7 +58,7 @@ export default class WallLayer<DataT = any, ExtraProps extends {} = {}> extends 
   static defaultProps = defaultProps;
 
   getShaders() {
-    return super.getShaders({vs, fs, modules: [project32, picking]});
+    return super.getShaders({vs, fs, modules: [project32]});
   }
 
   initializeState() {
