@@ -101,9 +101,7 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
       data: [arc0] as any,
       getSourcePosition: d => d.source,
       getTargetPosition: d => d.target,
-      getSourceColor: (d: any) => (d.gain > 0 ? inFlowColors : outFlowColors)[d.quantile] as any,
-      getTargetColor: (d: any) => (d.gain > 0 ? outFlowColors : inFlowColors)[d.quantile] as any,
-      getWidth: strokeWidth,
+      getColor: [255, 0, 0, 125],
     })
   ];
 
