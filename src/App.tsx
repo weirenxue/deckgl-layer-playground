@@ -5,7 +5,7 @@ import DeckGL from '@deck.gl/react/typed';
 import {GeoJsonLayer} from '@deck.gl/layers/typed';
 import {scaleQuantile} from 'd3-scale';
 import './App.css';
-import MyLineLayer from './Layer'
+import WallLayer from './wall-layer'
 
 
 export const inFlowColors = [
@@ -84,7 +84,12 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
   arc0.target[1] = arc0.source[1] - 0.01
   arc0.target[2] = 200
 
-  console.log(arc0)
+  let arc1 = {source: [...arc0.target], target: [...arc0.target]}
+  arc1.target[0] = arc1.source[0] + 0.01
+  arc1.target[1] = arc1.source[1] - 0.01
+  arc1.source[2] = 200
+  arc1.target[2] = 400
+  console.log(arc1)
 
   const layers = [
     // new GeoJsonLayer({
@@ -96,12 +101,12 @@ function App({data, strokeWidth = 1, mapStyle = MAP_STYLE}: any) {
     //   onClick: ({object}: any) => selectCounty(object),
     //   pickable: true
     // }),
-    new MyLineLayer({
+    new WallLayer({
       id: 'arc',
-      data: [arc0] as any,
+      data: [arc0, arc1] as any,
       getSourcePosition: d => d.source,
       getTargetPosition: d => d.target,
-      getColor: [255, 0, 0, 125],
+      getColor: [255, 0, 0, 80],
     })
   ];
 

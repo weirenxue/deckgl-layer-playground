@@ -30,11 +30,11 @@ void main(void) {
   vec4 target_floor = project_position_to_clipspace(target_floor_world, target_floor_world_64low, vec3(0.));
   
   float segmentIndex = positions.x;
-  vec4 p1 = mix(source, target, segmentIndex);
-  vec4 p2 = mix(source_floor, target_floor, segmentIndex);
+  vec4 topPosition = mix(source, target, segmentIndex);
+  vec4 floorPosition = mix(source_floor, target_floor, segmentIndex);
+  
   float heightIndex = positions.z;
-
-  gl_Position = mix(p1, p2, heightIndex);
+  gl_Position = mix(topPosition, floorPosition, heightIndex);
 
   // Color
   vColor = vec4(instanceColors.rgb, instanceColors.a * opacity);

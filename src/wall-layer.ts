@@ -13,8 +13,8 @@ import {
 import GL from '@luma.gl/constants';
 import {Model, Geometry} from '@luma.gl/core';
 
-import vs from './line-layer-vertex.glsl';
-import fs from './line-layer-fragment.glsl';
+import vs from './wall-layer-vertex.glsl';
+import fs from './wall-layer-fragment.glsl';
 
 const DEFAULT_COLOR: [number, number, number, number] = [0, 0, 0, 255];
 
