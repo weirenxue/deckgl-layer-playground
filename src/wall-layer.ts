@@ -18,17 +18,17 @@ import fs from './wall-layer-fragment.glsl';
 
 const DEFAULT_COLOR: [number, number, number, number] = [0, 0, 0, 255];
 
-const defaultProps: DefaultProps<LineLayerProps> = {
+const defaultProps: DefaultProps<WallLayerProps> = {
   getSourcePosition: {type: 'accessor', value: x => x.sourcePosition},
   getTargetPosition: {type: 'accessor', value: x => x.targetPosition},
   getColor: {type: 'accessor', value: DEFAULT_COLOR},
 };
 
-/** All properties supported by LineLayer. */
-export type LineLayerProps<DataT = any> = _LineLayerProps<DataT> & LayerProps;
+/** All properties supported by WallLayer. */
+export type WallLayerProps<DataT = any> = _WallLayerProps<DataT> & LayerProps;
 
-/** Properties added by LineLayer. */
-type _LineLayerProps<DataT> = {
+/** Properties added by WallLayer. */
+type _WallLayerProps<DataT> = {
   data: LayerDataSource<DataT>;
   /**
    * Source position of each object.
@@ -52,10 +52,10 @@ type _LineLayerProps<DataT> = {
 /**
  * A layer that renders straight lines joining pairs of source and target coordinates.
  */
-export default class LineLayer<DataT = any, ExtraProps extends {} = {}> extends Layer<
-  ExtraProps & Required<_LineLayerProps<DataT>>
+export default class WallLayer<DataT = any, ExtraProps extends {} = {}> extends Layer<
+  ExtraProps & Required<_WallLayerProps<DataT>>
 > {
-  static layerName = 'LineLayer';
+  static layerName = 'WallLayer';
   static defaultProps = defaultProps;
 
   getShaders() {
@@ -86,7 +86,6 @@ export default class LineLayer<DataT = any, ExtraProps extends {} = {}> extends 
         normalized: true,
         transition: true,
         accessor: 'getColor',
-        defaultValue: [0, 0, 0, 255],
       },
     });
   }
