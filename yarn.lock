@@ -4465,7 +4465,7 @@ decimal.js@^10.2.1:
   resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.4.3.tgz#1044092884d245d1b7f65725fa4ad4c6f781cc23"
   integrity sha512-VBBaLc1MgL5XpzgIP7ny5Z6Nx3UrRkIViUkPUdtl9aya5amy3De1gsUUSB1g3+3sExYNjCAsAznmukyxCb1GRA==
 
-deck.gl@^8.8.0:
+deck.gl@8.9.20:
   version "8.9.20"
   resolved "https://registry.yarnpkg.com/deck.gl/-/deck.gl-8.9.20.tgz#c0db788cea200198f106051d891923dfda99f2a1"
   integrity sha512-NqbjZxePsW5UcUnzoYOREfxhyd9QAr2kRaDnhrVBdZurdV9rVLfvZBM1MDyOn+h33RU/9lCClLU88bvkUaQG/w==

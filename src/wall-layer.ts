@@ -121,6 +121,8 @@ export default class WallLayer<DataT = any, ExtraProps extends {} = {}> extends 
       1, 0, 1
     ];
 
+    gl.depthMask(false)
+
     return new Model(gl, {
       ...this.getShaders(),
       id: this.props.id,
